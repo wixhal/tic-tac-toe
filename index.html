@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tic‑Tac‑Toe — PvP & Vs Computer</title>
+  <style>
+    :root {
+      --bg: #0f172a;           /* slate-900 */
+      --card: #111827;         /* gray-900 */
+      --muted: #94a3b8;        /* slate-400 */
+      --text: #e5e7eb;         /* gray-200 */
+      --accent: #22c55e;       /* green-500 */
+      --accent-2: #3b82f6;     /* blue-500 */
+      --danger: #ef4444;       /* red-500 */
+      --shadow: 0 10px 30px rgba(0,0,0,.45);
+      --radius: 16px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: radial-gradient(1200px 800px at 80% -20%, #1f2937 0%, var(--bg) 55%), var(--bg);
+      color: var(--text);
+      min-height: 100vh; display: grid; place-items: center; padding: 24px;
+    }
+    .app {
+      width: 100%; max-width: 980px; display: grid; gap: 18px;
+      grid-template-columns: 1fr; align-items: start;
+    }
+    header { display:flex; align-items:center; justify-content:space-between; gap: 12px; flex-wrap: wrap; }
+    h1 { font-size: clamp(22px, 2.8vw, 34px); margin: 0; letter-spacing: .4px; }
+    .card { background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); border: 1px solid rgba(255,255,255,.08); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; }
+
+    .controls { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); align-items: end; }
+    .row { display:flex; gap: 10px; align-items:center; flex-wrap: wrap; }
+    .label { font-size: 14px; color: var(--muted); }
+    .badges { display:flex; gap:8px; flex-wrap: wrap; }
+    .badge { border:1px solid rgba(255,255,255,.12); color: var(--text); padding: 6px 10px; border-radius: 999px; cursor:pointer; user-select:none; transition: .2s ease; background: rgba(255,255,255,.02); }
+    .badge.active { background: var(--accent-2); border-color: transparent; color: white; }
+
+    .select { appearance: none; border:1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.03); color: var(--text); padding: 10px 12px; border-radius: 12px; width: 100%; outline: none; }
+    .btn { border: none; padding: 12px 16px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: transform .04s ease, filter .2s ease; }
+    .btn:hover { filter: brightness(1.08); }
+    .btn:active { transform: translateY(1px); }
+    .btn.primary { background: linear-gradient(180deg, #60a5fa, #3b82f6); color: white; }
+    .btn.ghost { background: rgba(255,255,255,.06); color: var(--text); border: 1px solid rgba(255,255,255,.12); }
+
+    .board-wrap { display:grid; gap: 16px; grid-template-columns: 1fr; }
+    .board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); padding: 12px; border-radius: 20px; box-shadow: var(--shadow); }
+    .cell { aspect-ratio: 1/1; display:grid; place-items:center; font-size: clamp(36px, 8vw, 68px); font-weight:900; border-radius: 16px; cursor: pointer; user-select: none; transition: background .15s ease, transform .04s ease, color .2s ease; background: #0b1220; border:1px solid rgba(255,255,255,.08); }
+    .cell:hover { background: #0e1627; }
+    .cell:active { transform: translateY(1px); }
+    .cell.disabled { cursor: not-allowed; opacity: .6; }
+    .cell.X { color: #22d3ee; /* cyan-400 */ }
+    .cell.O { color: #f472b6; /* pink-400 */ }
+
+    .status { display:flex; align-items:center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .status .who { font-size: 15px; color: var(--muted); }
+    .status .big { font-size: clamp(16px, 2.6vw, 22px); font-weight: 700; }
+    .pill { padding: 8px 12px; border-radius: 999px; border:1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.04); }
+
+    .footer { color: var(--muted); font-size: 12px; text-align: center; margin-top: 2px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header>
+      <h1>✨ Tic‑Tac‑Toe — PvP & Vs Computer</h1>
+      <button id="resetBtn" class="btn ghost" title="Start a fresh game">↻ Reset</button>
+    </header>
+
+    <section class="card">
+      <div class="controls">
+        <div class="row" role="radiogroup" aria-label="Game mode">
+          <span class="label">Mode:</span>
+          <div class="badges">
+            <button class="badge active" data-mode="pvp" aria-pressed="true">Player vs Player</button>
+            <button class="badge" data-mode="cpu" aria-pressed="false">Vs Computer</button>
+          </div>
+        </div>
+        <div class="row" id="difficultyWrap" style="display:none">
+          <label class="label" for="difficulty">Difficulty</label>
+          <select id="difficulty" class="select" aria-label="AI Difficulty">
+            <option value="easy">Easy (Random)</option>
+            <option value="unbeatable" selected>Unbeatable (Minimax)</option>
+          </select>
+        </div>
+        <div class="row">
+          <span class="label">You play as:</span>
+          <div class="badges">
+            <button class="badge active" data-side="X" aria-pressed="true">X</button>
+            <button class="badge" data-side="O" aria-pressed="false">O</button>
+          </div>
+        </div>
+        <div class="row">
+          <button id="newGameBtn" class="btn primary">New Game</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="board-wrap">
+      <div class="status card">
+        <div>
+          <div class="who">Turn</div>
+          <div class="big"><span id="turnText">X</span></div>
+        </div>
+        <div>
+          <div class="who">Status</div>
+          <div class="big"><span id="statusText">Game in progress…</span></div>
+        </div>
+        <div class="pill" id="modePill">Mode: PvP</div>
+      </div>
+
+      <div class="board" id="board" role="grid" aria-label="Tic‑Tac‑Toe board"></div>
+    </section>
+
+    <p class="footer">Made for learning: clean vanilla HTML/CSS/JS. No frameworks required.</p>
+  </main>
+
+  <script>
+    // ===== Game State =====
+    const boardEl = document.getElementById('board');
+    const turnText = document.getElementById('turnText');
+    const statusText = document.getElementById('statusText');
+    const resetBtn = document.getElementById('resetBtn');
+    const newGameBtn = document.getElementById('newGameBtn');
+    const difficulty = document.getElementById('difficulty');
+    const difficultyWrap = document.getElementById('difficultyWrap');
+    const modePill = document.getElementById('modePill');
+
+    let cells = Array(9).fill('');
+    let current = 'X';
+    let mode = 'pvp'; // 'pvp' or 'cpu'
+    let humanSide = 'X'; // X or O
+    let gameOver = false;
+
+    // Build board UI
+    function renderBoard() {
+      boardEl.innerHTML = '';
+      for (let i = 0; i < 9; i++) {
+        const btn = document.createElement('button');
+        btn.className = `cell ${cells[i] ? cells[i] : ''}`;
+        btn.setAttribute('role', 'gridcell');
+        btn.setAttribute('aria-label', cells[i] ? `Cell ${i+1}: ${cells[i]}` : `Empty cell ${i+1}`);
+        btn.textContent = cells[i];
+        btn.disabled = !!cells[i] || gameOver;
+        btn.addEventListener('click', () => handleMove(i));
+        boardEl.appendChild(btn);
+      }
+      turnText.textContent = current;
+    }
+
+    // Utilities
+    function availableMoves(state) { return state.map((v, i) => v === '' ? i : null).filter(v => v !== null); }
+
+    function winner(state) {
+      const lines = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+      ];
+      for (const [a,b,c] of lines) {
+        if (state[a] && state[a] === state[b] && state[a] === state[c]) return state[a];
+      }
+      return null;
+    }
+
+    function isDraw(state) { return !winner(state) && availableMoves(state).length === 0; }
+
+    function setStatus(text) { statusText.textContent = text; }
+
+    function endGame(msg) {
+      gameOver = true; setStatus(msg); renderBoard();
+      // disable all cells
+      [...boardEl.children].forEach(c => c.classList.add('disabled'));
+    }
+
+    // Handle player (or human) move
+    function handleMove(idx) {
+      if (gameOver || cells[idx]) return;
+      if (mode === 'cpu') {
+        // Only allow correct side to move
+        if (current !== humanSide) return;
+      }
+      cells[idx] = current;
+      const win = winner(cells);
+      if (win) return endGame(`Winner: ${win} 🎉`);
+      if (isDraw(cells)) return endGame("It's a draw! 🤝");
+      current = current === 'X' ? 'O' : 'X';
+      setStatus('Game in progress…');
+      renderBoard();
+      if (mode === 'cpu') maybeComputerMove();
+    }
+
+    // Computer move controller
+    function maybeComputerMove() {
+      if (gameOver) return;
+      if (current !== humanSide) {
+        // Slight delay for UX
+        setTimeout(() => {
+          const move = (difficulty.value === 'easy') ? randomMove() : bestMoveMinimax();
+          if (move !== null) {
+            cells[move] = current;
+            const win = winner(cells);
+            if (win) return endGame(`Winner: ${win} 🤖`);
+            if (isDraw(cells)) return endGame("It's a draw! 🤝");
+            current = current === 'X' ? 'O' : 'X';
+            renderBoard();
+          }
+        }, 350);
+      }
+    }
+
+    function randomMove() {
+      const moves = availableMoves(cells);
+      if (moves.length === 0) return null;
+      return moves[Math.floor(Math.random() * moves.length)];
+    }
+
+    // Minimax (unbeatable) — AI plays as 'O' or 'X' depending on current, but we frame from 'aiSide'
+    function bestMoveMinimax() {
+      const aiSide = current; // side whose turn it is
+      let bestScore = -Infinity; let move = null;
+      for (const idx of availableMoves(cells)) {
+        cells[idx] = aiSide;
+        const score = minimax(cells, 0, false, aiSide);
+        cells[idx] = '';
+        if (score > bestScore) { bestScore = score; move = idx; }
+      }
+      return move;
+    }
+
+    function minimax(state, depth, isMaximizing, aiSide) {
+      const opp = aiSide === 'X' ? 'O' : 'X';
+      const win = winner(state);
+      if (win === aiSide) return 10 - depth; // prefer faster wins
+      if (win === opp) return depth - 10;    // prefer slower losses
+      if (isDraw(state)) return 0;
+
+      if (isMaximizing) {
+        let best = -Infinity;
+        for (const idx of availableMoves(state)) {
+          state[idx] = aiSide;
+          best = Math.max(best, minimax(state, depth + 1, false, aiSide));
+          state[idx] = '';
+        }
+        return best;
+      } else {
+        let best = Infinity;
+        for (const idx of availableMoves(state)) {
+          state[idx] = opp;
+          best = Math.min(best, minimax(state, depth + 1, true, aiSide));
+          state[idx] = '';
+        }
+        return best;
+      }
+    }
+
+    // New game / reset helpers
+    function resetState() {
+      cells = Array(9).fill('');
+      current = 'X';
+      gameOver = false;
+      setStatus('Game in progress…');
+      renderBoard();
+      if (mode === 'cpu' && humanSide === 'O') {
+        // Computer starts as X
+        maybeComputerMove();
+      }
+    }
+
+    // UI wiring — mode toggle
+    document.querySelectorAll('[data-mode]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-mode]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        mode = btn.dataset.mode;
+        const isCpu = mode === 'cpu';
+        difficultyWrap.style.display = isCpu ? 'flex' : 'none';
+        modePill.textContent = 'Mode: ' + (isCpu ? 'Vs Computer' : 'PvP');
+        resetState();
+      });
+    });
+
+    // Side selection
+    document.querySelectorAll('[data-side]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-side]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        humanSide = btn.dataset.side;
+        resetState();
+      });
+    });
+
+    resetBtn.addEventListener('click', resetState);
+    newGameBtn.addEventListener('click', resetState);
+
+    // Boot
+    renderBoard();
+  </script>
+</body>
+</html>
