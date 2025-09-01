@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tic‑Tac‑Toe — PvP & Vs Computer</title>
+  <title>Tic‑Tac‑Toe </title>
   <style>
     :root {
-      --bg: #0f172a;           /* slate-900 */
-      --card: #111827;         /* gray-900 */
-      --muted: #94a3b8;        /* slate-400 */
-      --text: #e5e7eb;         /* gray-200 */
-      --accent: #22c55e;       /* green-500 */
-      --accent-2: #3b82f6;     /* blue-500 */
+      --bg: #18093d;           /* slate-900 */
+      --card: #131c32;         /* gray-900 */
+      --muted: #d49bbf;        /* slate-400 */
+      --text: #ffffff;         /* gray-200 */
+      --accent: #7b4a15;       /* green-500 */
+      --accent-2: #10510e;     /* blue-500 */
       --danger: #ef4444;       /* red-500 */
       --shadow: 0 10px 30px rgba(0,0,0,.45);
       --radius: 16px;
@@ -19,12 +19,12 @@
     * { box-sizing: border-box; }
     body {
       margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-      background: radial-gradient(1200px 800px at 80% -20%, #1f2937 0%, var(--bg) 55%), var(--bg);
+      background: radial-gradient(1200px 900px at 80% -20%, #754c2d 0%, var(--bg) 75%), var(--bg);
       color: var(--text);
       min-height: 100vh; display: grid; place-items: center; padding: 24px;
     }
     .app {
-      width: 100%; max-width: 980px; display: grid; gap: 18px;
+      width: 100%; max-width: 1200px; display: grid; gap: 18px;
       grid-template-columns: 1fr; align-items: start;
     }
     header { display:flex; align-items:center; justify-content:space-between; gap: 12px; flex-wrap: wrap; }
@@ -39,10 +39,10 @@
     .badge.active { background: var(--accent-2); border-color: transparent; color: white; }
 
     .select { appearance: none; border:1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.03); color: var(--text); padding: 10px 12px; border-radius: 12px; width: 100%; outline: none; }
-    .btn { border: none; padding: 12px 16px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: transform .04s ease, filter .2s ease; }
-    .btn:hover { filter: brightness(1.08); }
+    .btn { border: none; padding: 12px 16px; border-radius: 10px; font-weight: 700; cursor: pointer; transition: transform .04s ease, filter .2s ease; }
+    .btn:hover { filter: brightness(1.18); }
     .btn:active { transform: translateY(1px); }
-    .btn.primary { background: linear-gradient(180deg, #60a5fa, #3b82f6); color: white; }
+    .btn.primary { background: linear-gradient(140deg, #67a3ec, #813082); color: white; }
     .btn.ghost { background: rgba(255,255,255,.06); color: var(--text); border: 1px solid rgba(255,255,255,.12); }
 
     .board-wrap { display:grid; gap: 16px; grid-template-columns: 1fr; }
@@ -61,12 +61,50 @@
 
     .footer { color: var(--muted); font-size: 12px; text-align: center; margin-top: 2px; }
     .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
+
+
+#difficulty {
+  background-color: #351e55d5;   
+  color: #ffffff;             
+  border: 2px solid #57462a;   
+  border-radius: 12px;        
+  padding: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+#difficulty option {
+  background-color: #1a1a2e;   
+  color: #ffffff;              
+  padding: 8px;
+}
+
+#difficulty option:hover {
+  background-color: #6a5acd;   
+  color: #fff;
+}
+
+.cell {
+  width: 120px;    /* smaller width */
+  height: 120px;   /* smaller height */
+  font-size: 36px; /* smaller X and O */
+}
+
+#board {
+  display: grid;
+  grid-template-columns: repeat(3, 120px);
+  grid-template-rows: repeat(3, 120px);
+  gap: 10px;               /* spacing between boxes */
+  justify-content: center; /* center horizontally */
+  align-items: center;     /* center vertically inside container */
+  margin: 0 auto;          /* ensure center horizontally */
+}
   </style>
 </head>
 <body>
   <main class="app">
     <header>
-      <h1>✨ Tic‑Tac‑Toe — PvP & Vs Computer</h1>
+      <h1> Tic‑Tac‑Toe</h1>
       <button id="resetBtn" class="btn ghost" title="Start a fresh game">↻ Reset</button>
     </header>
 
@@ -81,9 +119,9 @@
         </div>
         <div class="row" id="difficultyWrap" style="display:none">
           <label class="label" for="difficulty">Difficulty</label>
-          <select id="difficulty" class="select" aria-label="AI Difficulty">
-            <option value="easy">Easy (Random)</option>
-            <option value="unbeatable" selected>Unbeatable (Minimax)</option>
+          <select id="difficulty" class="select" aria-label="AI Difficulty" style="width:160px;">
+            <option value="easy">Easy</option>
+            <option value="unbeatable" selected>Unbeatable</option>
           </select>
         </div>
         <div class="row">
@@ -115,7 +153,7 @@
       <div class="board" id="board" role="grid" aria-label="Tic‑Tac‑Toe board"></div>
     </section>
 
-    <p class="footer">Made for learning: clean vanilla HTML/CSS/JS. No frameworks required.</p>
+    <p class="footer">Made for learning by wixhal.</p>
   </main>
 
   <script>
