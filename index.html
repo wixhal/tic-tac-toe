@@ -14,15 +14,14 @@
             box-sizing: border-box;
         }
 
-        /* --- NO-SCROLL LAYOUT CHANGES --- */
         body {
             background-color: #1a1a1a;
             color: #FFFFFF;
             font-family: 'Patrick Hand', cursive;
             font-size: 20px;
             width: 100vw;
-            height: 100vh; /* Lock height to the screen */
-            overflow: hidden; /* Prevent scrollbars */
+            height: 100vh;
+            overflow: hidden;
             padding: 20px;
             display: flex;
             flex-direction: column;
@@ -35,7 +34,7 @@
             align-items: center;
             width: 100%;
             padding: 0 20px;
-            margin-bottom: 20px; /* Reduced margin */
+            margin-bottom: 20px;
         }
 
         .title {
@@ -69,7 +68,7 @@
             align-items: center;
             width: 100%;
             padding: 0 20px;
-            margin-bottom: 20px; /* Reduced margin */
+            margin-bottom: 40px; /* Increased margin to create the gap */
             gap: 20px;
         }
 
@@ -196,12 +195,11 @@
             display: flex;
             justify-content: center;
             width: 100%;
-            margin: 10px 0; /* Reduced margin */
+            margin: 10px 0;
         }
 
         .board {
             display: grid;
-            /* Reduced size to help everything fit */
             grid-template-columns: repeat(3, 110px);
             grid-template-rows: repeat(3, 110px);
             gap: 4px;
@@ -214,7 +212,7 @@
             background-color: #1a1a1a;
             border: none;
             color: #FFFFFF;
-            font-size: 72px; /* Reduced size */
+            font-size: 72px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -234,7 +232,7 @@
         .status {
             text-align: center;
             font-size: 22px;
-            margin: 10px 0; /* Reduced margin */
+            margin: 10px 0;
             width: 100%;
             min-height: 24px;
         }
@@ -243,12 +241,12 @@
             display: flex;
             justify-content: center;
             gap: 40px;
-            margin: 15px 0; /* Reduced margin */
+            margin: 15px 0;
             width: 100%;
         }
 
         .footer {
-            margin-top: auto; /* Pushes the footer to the bottom */
+            margin-top: auto;
             padding: 10px;
             text-align: center;
             font-size: 16px;
