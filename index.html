@@ -1,341 +1,613 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tic‑Tac‑Toe </title>
-  <style>
-    :root {
-      --bg: #18093d;           /* slate-900 */
-      --card: #131c32;         /* gray-900 */
-      --muted: #d49bbf;        /* slate-400 */
-      --text: #ffffff;         /* gray-200 */
-      --accent: #7b4a15;       /* green-500 */
-      --accent-2: #10510e;     /* blue-500 */
-      --danger: #ef4444;       /* red-500 */
-      --shadow: 0 10px 30px rgba(0,0,0,.45);
-      --radius: 16px;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-      background: radial-gradient(1200px 900px at 80% -20%, #754c2d 0%, var(--bg) 75%), var(--bg);
-      color: var(--text);
-      min-height: 100vh; display: grid; place-items: center; padding: 24px;
-    }
-    .app {
-      width: 100%; max-width: 1200px; display: grid; gap: 18px;
-      grid-template-columns: 1fr; align-items: start;
-    }
-    header { display:flex; align-items:center; justify-content:space-between; gap: 12px; flex-wrap: wrap; }
-    h1 { font-size: clamp(22px, 2.8vw, 34px); margin: 0; letter-spacing: .4px; }
-    .card { background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); border: 1px solid rgba(255,255,255,.08); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    .controls { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); align-items: end; }
-    .row { display:flex; gap: 10px; align-items:center; flex-wrap: wrap; }
-    .label { font-size: 14px; color: var(--muted); }
-    .badges { display:flex; gap:8px; flex-wrap: wrap; }
-    .badge { border:1px solid rgba(255,255,255,.12); color: var(--text); padding: 6px 10px; border-radius: 999px; cursor:pointer; user-select:none; transition: .2s ease; background: rgba(255,255,255,.02); }
-    .badge.active { background: var(--accent-2); border-color: transparent; color: white; }
+        /* --- NO-SCROLL LAYOUT CHANGES --- */
+        body {
+            background-color: #1a1a1a;
+            color: #FFFFFF;
+            font-family: 'Patrick Hand', cursive;
+            font-size: 20px;
+            width: 100vw;
+            height: 100vh; /* Lock height to the screen */
+            overflow: hidden; /* Prevent scrollbars */
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-    .select { appearance: none; border:1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.03); color: var(--text); padding: 10px 12px; border-radius: 12px; width: 100%; outline: none; }
-    .btn { border: none; padding: 12px 16px; border-radius: 10px; font-weight: 700; cursor: pointer; transition: transform .04s ease, filter .2s ease; }
-    .btn:hover { filter: brightness(1.18); }
-    .btn:active { transform: translateY(1px); }
-    .btn.primary { background: linear-gradient(140deg, #67a3ec, #813082); color: white; }
-    .btn.ghost { background: rgba(255,255,255,.06); color: var(--text); border: 1px solid rgba(255,255,255,.12); }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 0 20px;
+            margin-bottom: 20px; /* Reduced margin */
+        }
 
-    .board-wrap { display:grid; gap: 16px; grid-template-columns: 1fr; }
-    .board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); padding: 12px; border-radius: 20px; box-shadow: var(--shadow); }
-    .cell { aspect-ratio: 1/1; display:grid; place-items:center; font-size: clamp(36px, 8vw, 68px); font-weight:900; border-radius: 16px; cursor: pointer; user-select: none; transition: background .15s ease, transform .04s ease, color .2s ease; background: #0b1220; border:1px solid rgba(255,255,255,.08); }
-    .cell:hover { background: #0e1627; }
-    .cell:active { transform: translateY(1px); }
-    .cell.disabled { cursor: not-allowed; opacity: .6; }
-    .cell.X { color: #22d3ee; /* cyan-400 */ }
-    .cell.O { color: #f472b6; /* pink-400 */ }
+        .title {
+            font-size: 50px;
+        }
 
-    .status { display:flex; align-items:center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-    .status .who { font-size: 15px; color: var(--muted); }
-    .status .big { font-size: clamp(16px, 2.6vw, 22px); font-weight: 700; }
-    .pill { padding: 8px 12px; border-radius: 999px; border:1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.04); }
+        .controls {
+            display: flex;
+            gap: 20px;
+        }
 
-    .footer { color: var(--muted); font-size: 12px; text-align: center; margin-top: 2px; }
-    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
+        .btn {
+            background: none;
+            border: 2px solid #FFFFFF;
+            color: #FFFFFF;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-family: 'Patrick Hand', cursive;
+            font-size: 18px;
+            cursor: pointer;
+        }
 
+        .btn:hover {
+            background-color: #FFFFFF;
+            color: #1a1a1a;
+        }
 
-#difficulty {
-  background-color: #351e55d5;   
-  color: #ffffff;             
-  border: 2px solid #57462a;   
-  border-radius: 12px;        
-  padding: 6px;
-  font-size: 14px;
-  cursor: pointer;
-}
+        .game-info {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            width: 100%;
+            padding: 0 20px;
+            margin-bottom: 20px; /* Reduced margin */
+            gap: 20px;
+        }
 
-#difficulty option {
-  background-color: #1a1a2e;   
-  color: #ffffff;              
-  padding: 8px;
-}
+        .mode-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
 
-#difficulty option:hover {
-  background-color: #6a5acd;   
-  color: #fff;
-}
+        .mode-buttons {
+            display: flex;
+            gap: 10px;
+        }
 
-.cell {
-  width: 120px;    /* smaller width */
-  height: 120px;   /* smaller height */
-  font-size: 36px; /* smaller X and O */
-}
+        .mode-btn {
+            background: none;
+            border: 2px solid #FFFFFF;
+            color: #FFFFFF;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-family: 'Patrick Hand', cursive;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        
+        .mode-btn:hover,
+        .mode-btn.active {
+            background-color: #FFFFFF;
+            color: #1a1a1a;
+        }
 
-#board {
-  display: grid;
-  grid-template-columns: repeat(3, 120px);
-  grid-template-rows: repeat(3, 120px);
-  gap: 10px;               /* spacing between boxes */
-  justify-content: center; /* center horizontally */
-  align-items: center;     /* center vertically inside container */
-  margin: 0 auto;          /* ensure center horizontally */
-}
-  </style>
+        .difficulty-dropdown {
+            position: relative;
+        }
+
+        .difficulty-btn {
+            background: none;
+            border: 2px solid #FFFFFF;
+            color: #FFFFFF;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-family: 'Patrick Hand', cursive;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            min-width: 140px;
+            text-align: center;
+        }
+
+        .difficulty-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: #1a1a1a;
+            border: 2px solid #FFFFFF;
+            border-radius: 8px;
+            border-top: none;
+            min-width: 120px;
+            width: 100%;
+            display: none;
+            z-index: 10;
+        }
+
+        .difficulty-options.show {
+            display: block;
+        }
+
+        .difficulty-option {
+            padding: 8px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #FFFFFF;
+            text-align: center;
+        }
+
+        .difficulty-option:last-child {
+            border-bottom: none;
+        }
+
+        .difficulty-option:hover {
+            background-color: #FFFFFF;
+            color: #1a1a1a;
+        }
+
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            justify-self: center; 
+        }
+
+        .symbol-btn {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #FFFFFF;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            background: none;
+            color: #FFFFFF;
+            cursor: pointer;
+            font-family: 'Patrick Hand', cursive;
+        }
+        
+        .symbol-btn:hover,
+        .symbol-btn.selected {
+            background-color: #FFFFFF;
+            color: #1a1a1a;
+        }
+
+        .current-player {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-self: end; 
+        }
+
+        .board-container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            margin: 10px 0; /* Reduced margin */
+        }
+
+        .board {
+            display: grid;
+            /* Reduced size to help everything fit */
+            grid-template-columns: repeat(3, 110px);
+            grid-template-rows: repeat(3, 110px);
+            gap: 4px;
+            background-color: #FFFFFF;
+            padding: 0;
+            border-radius: 8px;
+        }
+
+        .cell {
+            background-color: #1a1a1a;
+            border: none;
+            color: #FFFFFF;
+            font-size: 72px; /* Reduced size */
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Patrick Hand', cursive;
+        }
+
+        .cell:hover:empty {
+            background-color: #333;
+        }
+
+        .cell.winner {
+            background-color: #FFFFFF;
+            color: #1a1a1a;
+        }
+
+        .status {
+            text-align: center;
+            font-size: 22px;
+            margin: 10px 0; /* Reduced margin */
+            width: 100%;
+            min-height: 24px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 15px 0; /* Reduced margin */
+            width: 100%;
+        }
+
+        .footer {
+            margin-top: auto; /* Pushes the footer to the bottom */
+            padding: 10px;
+            text-align: center;
+            font-size: 16px;
+            color: #AAAAAA;
+        }
+
+        .footer a {
+            color: #FFFFFF;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-  <main class="app">
-    <header>
-      <h1> Tic‑Tac‑Toe</h1>
-      <button id="resetBtn" class="btn ghost" title="Start a fresh game">↻ Reset</button>
-    </header>
-
-    <section class="card">
-      <div class="controls">
-        <div class="row" role="radiogroup" aria-label="Game mode">
-          <span class="label">Mode:</span>
-          <div class="badges">
-            <button class="badge active" data-mode="pvp" aria-pressed="true">Player vs Player</button>
-            <button class="badge" data-mode="cpu" aria-pressed="false">Vs Computer</button>
-          </div>
+    <div class="header">
+        <div class="title">Tic-Tac-Toe</div>
+        <div class="controls">
+            <button class="btn" onclick="resetGame()">Reset</button>
+            <button class="btn" onclick="newGame()">New Game</button>
         </div>
-        <div class="row" id="difficultyWrap" style="display:none">
-          <label class="label" for="difficulty">Difficulty</label>
-          <select id="difficulty" class="select" aria-label="AI Difficulty" style="width:160px;">
-            <option value="easy">Easy</option>
-            <option value="unbeatable" selected>Unbeatable</option>
-          </select>
+    </div>
+
+    <div class="game-info">
+        <div class="mode-section">
+            <span>Mode:</span>
+            <div class="mode-buttons">
+                <button class="mode-btn" id="pvp-btn" onclick="setMode('pvp')">Player vs Player</button>
+                <button class="mode-btn active" id="pvc-btn" onclick="setMode('pvc')">vs Computer</button>
+            </div>
+            
+            <div class="difficulty-dropdown">
+                <button class="difficulty-btn" onclick="toggleDifficulty()">
+                    <span id="difficulty-text">Easy</span>
+                    <span>▼</span>
+                </button>
+                <div class="difficulty-options" id="difficulty-options">
+                    <div class="difficulty-option" onclick="setDifficulty('easy')">Easy</div>
+                    <div class="difficulty-option" onclick="setDifficulty('medium')">Medium</div>
+                    <div class="difficulty-option" onclick="setDifficulty('unbeatable')">Unbeatable</div>
+                </div>
+            </div>
         </div>
-        <div class="row">
-          <span class="label">You play as:</span>
-          <div class="badges">
-            <button class="badge active" data-side="X" aria-pressed="true">X</button>
-            <button class="badge" data-side="O" aria-pressed="false">O</button>
-          </div>
+
+        <div class="player-info">
+            <span>You Play As:</span>
+            <button class="symbol-btn selected" id="symbol-x" onclick="selectSymbol('X')">X</button>
+            <button class="symbol-btn" id="symbol-o" onclick="selectSymbol('O')">O</button>
         </div>
-        <div class="row">
-          <button id="newGameBtn" class="btn primary">New Game</button>
+
+        <div class="current-player">
+            <span>Now Playing:</span>
+            <span id="current-turn">X</span>
         </div>
-      </div>
-    </section>
+    </div>
 
-    <section class="board-wrap">
-      <div class="status card">
-        <div>
-          <div class="who">Turn</div>
-          <div class="big"><span id="turnText">X</span></div>
+    <div class="board-container">
+        <div class="board" id="board">
+            <button class="cell" onclick="makeMove(0)"></button>
+            <button class="cell" onclick="makeMove(1)"></button>
+            <button class="cell" onclick="makeMove(2)"></button>
+            <button class="cell" onclick="makeMove(3)"></button>
+            <button class="cell" onclick="makeMove(4)"></button>
+            <button class="cell" onclick="makeMove(5)"></button>
+            <button class="cell" onclick="makeMove(6)"></button>
+            <button class="cell" onclick="makeMove(7)"></button>
+            <button class="cell" onclick="makeMove(8)"></button>
         </div>
-        <div>
-          <div class="who">Status</div>
-          <div class="big"><span id="statusText">Game in progress…</span></div>
-        </div>
-        <div class="pill" id="modePill">Mode: PvP</div>
-      </div>
+    </div>
 
-      <div class="board" id="board" role="grid" aria-label="Tic‑Tac‑Toe board"></div>
-    </section>
+    <div class="status" id="status"></div>
 
-    <p class="footer">Made for learning by wixhal.</p>
-  </main>
+    <div class="stats">
+        <span>Player 1: <span id="player1-score">0</span></span>
+        <span><span id="p2-label">Computer</span>: <span id="player2-score">0</span></span>
+        <span>Draws: <span id="draws-score">0</span></span>
+    </div>
 
-  <script>
-    // ===== Game State =====
-    const boardEl = document.getElementById('board');
-    const turnText = document.getElementById('turnText');
-    const statusText = document.getElementById('statusText');
-    const resetBtn = document.getElementById('resetBtn');
-    const newGameBtn = document.getElementById('newGameBtn');
-    const difficulty = document.getElementById('difficulty');
-    const difficultyWrap = document.getElementById('difficultyWrap');
-    const modePill = document.getElementById('modePill');
+    <div class="footer">
+        Made for learning purposes: <a href="https://github.com/wixhal" target="_blank" rel="noopener noreferrer">wixhal</a>
+    </div>
 
-    let cells = Array(9).fill('');
-    let current = 'X';
-    let mode = 'pvp'; // 'pvp' or 'cpu'
-    let humanSide = 'X'; // X or O
-    let gameOver = false;
+    <script>
+        // JavaScript logic is the same
+        let board = ['', '', '', '', '', '', '', '', ''];
+        let currentPlayer = 'X';
+        let playerSymbol = 'X';
+        let gameMode = 'pvc'; 
+        let difficulty = 'easy';
+        let gameActive = true;
+        let scores = { player1: 0, player2: 0, draws: 0 };
 
-    // Build board UI
-    function renderBoard() {
-      boardEl.innerHTML = '';
-      for (let i = 0; i < 9; i++) {
-        const btn = document.createElement('button');
-        btn.className = `cell ${cells[i] ? cells[i] : ''}`;
-        btn.setAttribute('role', 'gridcell');
-        btn.setAttribute('aria-label', cells[i] ? `Cell ${i+1}: ${cells[i]}` : `Empty cell ${i+1}`);
-        btn.textContent = cells[i];
-        btn.disabled = !!cells[i] || gameOver;
-        btn.addEventListener('click', () => handleMove(i));
-        boardEl.appendChild(btn);
-      }
-      turnText.textContent = current;
-    }
+        const winningConditions = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8],
+            [0, 3, 6], [1, 4, 7], [2, 5, 8],
+            [0, 4, 8], [2, 4, 6]
+        ];
 
-    // Utilities
-    function availableMoves(state) { return state.map((v, i) => v === '' ? i : null).filter(v => v !== null); }
-
-    function winner(state) {
-      const lines = [
-        [0,1,2],[3,4,5],[6,7,8],
-        [0,3,6],[1,4,7],[2,5,8],
-        [0,4,8],[2,4,6]
-      ];
-      for (const [a,b,c] of lines) {
-        if (state[a] && state[a] === state[b] && state[a] === state[c]) return state[a];
-      }
-      return null;
-    }
-
-    function isDraw(state) { return !winner(state) && availableMoves(state).length === 0; }
-
-    function setStatus(text) { statusText.textContent = text; }
-
-    function endGame(msg) {
-      gameOver = true; setStatus(msg); renderBoard();
-      // disable all cells
-      [...boardEl.children].forEach(c => c.classList.add('disabled'));
-    }
-
-    // Handle player (or human) move
-    function handleMove(idx) {
-      if (gameOver || cells[idx]) return;
-      if (mode === 'cpu') {
-        // Only allow correct side to move
-        if (current !== humanSide) return;
-      }
-      cells[idx] = current;
-      const win = winner(cells);
-      if (win) return endGame(`Winner: ${win} 🎉`);
-      if (isDraw(cells)) return endGame("It's a draw! 🤝");
-      current = current === 'X' ? 'O' : 'X';
-      setStatus('Game in progress…');
-      renderBoard();
-      if (mode === 'cpu') maybeComputerMove();
-    }
-
-    // Computer move controller
-    function maybeComputerMove() {
-      if (gameOver) return;
-      if (current !== humanSide) {
-        // Slight delay for UX
-        setTimeout(() => {
-          const move = (difficulty.value === 'easy') ? randomMove() : bestMoveMinimax();
-          if (move !== null) {
-            cells[move] = current;
-            const win = winner(cells);
-            if (win) return endGame(`Winner: ${win} 🤖`);
-            if (isDraw(cells)) return endGame("It's a draw! 🤝");
-            current = current === 'X' ? 'O' : 'X';
-            renderBoard();
-          }
-        }, 350);
-      }
-    }
-
-    function randomMove() {
-      const moves = availableMoves(cells);
-      if (moves.length === 0) return null;
-      return moves[Math.floor(Math.random() * moves.length)];
-    }
-
-    // Minimax (unbeatable) — AI plays as 'O' or 'X' depending on current, but we frame from 'aiSide'
-    function bestMoveMinimax() {
-      const aiSide = current; // side whose turn it is
-      let bestScore = -Infinity; let move = null;
-      for (const idx of availableMoves(cells)) {
-        cells[idx] = aiSide;
-        const score = minimax(cells, 0, false, aiSide);
-        cells[idx] = '';
-        if (score > bestScore) { bestScore = score; move = idx; }
-      }
-      return move;
-    }
-
-    function minimax(state, depth, isMaximizing, aiSide) {
-      const opp = aiSide === 'X' ? 'O' : 'X';
-      const win = winner(state);
-      if (win === aiSide) return 10 - depth; // prefer faster wins
-      if (win === opp) return depth - 10;    // prefer slower losses
-      if (isDraw(state)) return 0;
-
-      if (isMaximizing) {
-        let best = -Infinity;
-        for (const idx of availableMoves(state)) {
-          state[idx] = aiSide;
-          best = Math.max(best, minimax(state, depth + 1, false, aiSide));
-          state[idx] = '';
+        function selectSymbol(symbol) {
+            if (playerSymbol === symbol) return;
+            playerSymbol = symbol;
+            
+            document.getElementById('symbol-x').classList.remove('selected');
+            document.getElementById('symbol-o').classList.remove('selected');
+            
+            if (symbol === 'X') {
+                document.getElementById('symbol-x').classList.add('selected');
+            } else {
+                document.getElementById('symbol-o').classList.add('selected');
+            }
+            newGame();
         }
-        return best;
-      } else {
-        let best = Infinity;
-        for (const idx of availableMoves(state)) {
-          state[idx] = opp;
-          best = Math.min(best, minimax(state, depth + 1, true, aiSide));
-          state[idx] = '';
+
+        function setMode(mode) {
+            gameMode = mode;
+            const pvpBtn = document.getElementById('pvp-btn');
+            const pvcBtn = document.getElementById('pvc-btn');
+            const difficultyControl = document.querySelector('.difficulty-dropdown');
+            const p2Label = document.getElementById('p2-label');
+
+            if (mode === 'pvp') {
+                pvpBtn.classList.add('active');
+                pvcBtn.classList.remove('active');
+                difficultyControl.style.visibility = 'hidden'; 
+                p2Label.textContent = 'Player 2';
+            } else {
+                pvcBtn.classList.add('active');
+                pvpBtn.classList.remove('active');
+                difficultyControl.style.visibility = 'visible'; 
+                p2Label.textContent = 'Computer';
+            }
+            resetGame();
         }
-        return best;
-      }
-    }
 
-    // New game / reset helpers
-    function resetState() {
-      cells = Array(9).fill('');
-      current = 'X';
-      gameOver = false;
-      setStatus('Game in progress…');
-      renderBoard();
-      if (mode === 'cpu' && humanSide === 'O') {
-        // Computer starts as X
-        maybeComputerMove();
-      }
-    }
+        function toggleDifficulty() {
+            document.getElementById('difficulty-options').classList.toggle('show');
+        }
 
-    // UI wiring — mode toggle
-    document.querySelectorAll('[data-mode]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('[data-mode]').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        mode = btn.dataset.mode;
-        const isCpu = mode === 'cpu';
-        difficultyWrap.style.display = isCpu ? 'flex' : 'none';
-        modePill.textContent = 'Mode: ' + (isCpu ? 'Vs Computer' : 'PvP');
-        resetState();
-      });
-    });
+        function setDifficulty(level) {
+            difficulty = level;
+            document.getElementById('difficulty-text').textContent = level.charAt(0).toUpperCase() + level.slice(1);
+            document.getElementById('difficulty-options').classList.remove('show');
+            newGame();
+        }
 
-    // Side selection
-    document.querySelectorAll('[data-side]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('[data-side]').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        humanSide = btn.dataset.side;
-        resetState();
-      });
-    });
+        function makeMove(index) {
+            if (board[index] !== '' || !gameActive) return;
 
-    resetBtn.addEventListener('click', resetState);
-    newGameBtn.addEventListener('click', resetState);
+            board[index] = currentPlayer;
+            document.querySelectorAll('.cell')[index].textContent = currentPlayer;
+            
+            if (checkWinner()) {
+                gameActive = false;
+                highlightWinningCells();
+                
+                let winnerName;
+                if (gameMode === 'pvp') {
+                    winnerName = currentPlayer === playerSymbol ? 'Player 1' : 'Player 2';
+                } else {
+                    winnerName = currentPlayer === playerSymbol ? 'You' : 'Computer';
+                }
+                
+                updateStatus(`${winnerName} Won!!`);
+                updateScore(currentPlayer);
+                return;
+            }
 
-    // Boot
-    renderBoard();
-  </script>
+            if (board.every(cell => cell !== '')) {
+                gameActive = false;
+                updateStatus('Draw!!');
+                updateScore('draw');
+                return;
+            }
+
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            document.getElementById('current-turn').textContent = currentPlayer;
+
+            if (gameMode === 'pvc' && currentPlayer !== playerSymbol && gameActive) {
+                document.getElementById('board').style.pointerEvents = 'none';
+                updateStatus('Computer is thinking...');
+                setTimeout(() => {
+                    computerMove();
+                    if (gameActive) {
+                        document.getElementById('board').style.pointerEvents = 'auto';
+                        updateStatus('');
+                    }
+                }, 700);
+            }
+        }
+
+        function computerMove() {
+            if (!gameActive) return;
+            let moveIndex;
+            
+            if (difficulty === 'easy') {
+                moveIndex = getRandomMove();
+            } else if (difficulty === 'medium') {
+                moveIndex = Math.random() < 0.7 ? getBestMove() : getRandomMove();
+            } else { 
+                moveIndex = getBestMove();
+            }
+
+            makeMove(moveIndex);
+        }
+
+        function getRandomMove() {
+            const availableMoves = board.map((cell, index) => cell === '' ? index : null)
+                                        .filter(val => val !== null);
+            return availableMoves[Math.floor(Math.random() * availableMoves.length)];
+        }
+
+        function getBestMove() {
+            let bestScore = -Infinity;
+            let bestMove;
+            let computerSymbol = playerSymbol === 'X' ? 'O' : 'X';
+
+            for (let i = 0; i < 9; i++) {
+                if (board[i] === '') {
+                    board[i] = computerSymbol;
+                    let score = minimax(board, 0, false, computerSymbol);
+                    board[i] = '';
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestMove = i;
+                    }
+                }
+            }
+            return bestMove;
+        }
+
+        function minimax(board, depth, isMaximizing, computerSymbol) {
+            let result = checkWinnerForMinimax();
+            if (result !== null) {
+                if (result === computerSymbol) return 10 - depth;
+                if (result === playerSymbol) return depth - 10;
+                return 0;
+            }
+
+            if (isMaximizing) {
+                let bestScore = -Infinity;
+                for (let i = 0; i < 9; i++) {
+                    if (board[i] === '') {
+                        board[i] = computerSymbol;
+                        let score = minimax(board, depth + 1, false, computerSymbol);
+                        board[i] = '';
+                        bestScore = Math.max(score, bestScore);
+                    }
+                }
+                return bestScore;
+            } else {
+                let bestScore = Infinity;
+                for (let i = 0; i < 9; i++) {
+                    if (board[i] === '') {
+                        board[i] = playerSymbol;
+                        let score = minimax(board, depth + 1, true, computerSymbol);
+                        board[i] = '';
+                        bestScore = Math.min(score, bestScore);
+                    }
+                }
+                return bestScore;
+            }
+        }
+
+        function checkWinnerForMinimax() {
+            for (let condition of winningConditions) {
+                const [a, b, c] = condition;
+                if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                    return board[a]; 
+                }
+            }
+            return board.includes('') ? null : 'tie'; 
+        }
+
+        function checkWinner() {
+            return winningConditions.some(condition => {
+                const [a, b, c] = condition;
+                return board[a] && board[a] === board[b] && board[a] === board[c];
+            });
+        }
+
+        function highlightWinningCells() {
+            const winningCombination = winningConditions.find(condition => {
+                const [a, b, c] = condition;
+                return board[a] && board[a] === board[b] && board[a] === board[c];
+            });
+            if (winningCombination) {
+                winningCombination.forEach(index => {
+                    document.querySelectorAll('.cell')[index].classList.add('winner');
+                });
+            }
+        }
+
+        function updateStatus(message) {
+            document.getElementById('status').textContent = message;
+        }
+
+        function updateScore(winnerSymbol) {
+            if (winnerSymbol === 'draw') {
+                scores.draws++;
+            } else if (winnerSymbol === playerSymbol) {
+                scores.player1++;
+            } else {
+                scores.player2++;
+            }
+            
+            document.getElementById('player1-score').textContent = scores.player1;
+            document.getElementById('player2-score').textContent = scores.player2;
+            document.getElementById('draws-score').textContent = scores.draws;
+        }
+        
+        function newGame() {
+            board = ['', '', '', '', '', '', '', '', ''];
+            gameActive = true;
+
+            currentPlayer = 'X'; 
+            
+            document.querySelectorAll('.cell').forEach(cell => {
+                cell.textContent = '';
+                cell.classList.remove('winner');
+            });
+            document.getElementById('current-turn').textContent = currentPlayer;
+            updateStatus('');
+
+            if (gameMode === 'pvc' && currentPlayer !== playerSymbol) {
+                document.getElementById('board').style.pointerEvents = 'none';
+                updateStatus('Computer is thinking...');
+                setTimeout(() => {
+                    computerMove();
+                    if (gameActive) {
+                        document.getElementById('board').style.pointerEvents = 'auto';
+                        updateStatus('');
+                    }
+                }, 700);
+            } else {
+                document.getElementById('board').style.pointerEvents = 'auto';
+            }
+        }
+
+        function resetGame() {
+            scores = { player1: 0, player2: 0, draws: 0 };
+            document.getElementById('player1-score').textContent = '0';
+            document.getElementById('player2-score').textContent = '0';
+            document.getElementById('draws-score').textContent = '0';
+            newGame();
+        }
+        
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.difficulty-dropdown')) {
+                document.getElementById('difficulty-options').classList.remove('show');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            resetGame();
+        });
+
+    </script>
 </body>
 </html>
